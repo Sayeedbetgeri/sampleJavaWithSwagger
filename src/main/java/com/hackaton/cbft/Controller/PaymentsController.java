@@ -18,7 +18,7 @@ public class PaymentsController {
 	PaymentService PaymentService;
 	
 	@PostMapping(value = "/transfer")
-	private ResponseEntity<PaymentResponse> transferAmount(@RequestBody PaymentRequest paymentRequest)
+	public ResponseEntity<PaymentResponse> transferAmount(@RequestBody PaymentRequest paymentRequest)
 	{
 		PaymentResponse paymentResponse=PaymentService.processPayment(paymentRequest);
 		

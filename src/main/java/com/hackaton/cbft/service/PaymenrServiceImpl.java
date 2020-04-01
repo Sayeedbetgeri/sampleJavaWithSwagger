@@ -22,7 +22,7 @@ public class PaymenrServiceImpl implements PaymentService {
 
 	@Autowired
 	PaymentHistory paymentHistory;
-	
+
 	Map<String, String> destinationAccountMap = new HashMap<>();
 	Map<String, BigDecimal> roiMap = new HashMap<>();
 
@@ -33,8 +33,7 @@ public class PaymenrServiceImpl implements PaymentService {
 		System.out.println(paymentRequest);
 		PaymentResponse paymentResponse = new PaymentResponse();
 		Long destinationAccountId = (Long) paymentRequest.getDestAccountId();
-		if (!(destinationAccountMap.get("destAccountId").toString().equals(destinationAccountId.toString())))
-		{
+		if (!(destinationAccountMap.get("destAccountId").toString().equals(destinationAccountId.toString()))) {
 			System.out.println(destinationAccountMap.get("destAccountId"));
 			throw new DestinationAccountNotFoundException();
 		}
@@ -42,7 +41,8 @@ public class PaymenrServiceImpl implements PaymentService {
 			throw new DailyLimitException();
 		}
 		String destCurrency = destinationAccountMap.get("currency");
-		BigDecimal convertedAmount = calculateRateOfExchange(paymentRequest.getSourceAmount(), roiMap.get(destCurrency));
+		BigDecimal convertedAmount = calculateRateOfExchange(paymentRequest.getSourceAmount(),
+				roiMap.get(destCurrency));
 		BigDecimal processingFee = calculateProcessingFee(convertedAmount);
 		BigDecimal finalAmount = convertedAmount.subtract(processingFee);
 		paymentResponse.setFinalAmount(finalAmount);
@@ -50,7 +50,7 @@ public class PaymenrServiceImpl implements PaymentService {
 		paymentResponse.setSourceAmount(paymentRequest.getSourceAmount());
 		paymentResponse.setSourceCurrency(paymentRequest.getSourceCurrency());
 		paymentResponse.setExchangeRate(roiMap.get(destCurrency));
-		saveTransactionHistory(paymentRequest,paymentResponse);
+		saveTransactionHistory(paymentRequest, paymentResponse);
 		return paymentResponse;
 	}
 
@@ -64,9 +64,9 @@ public class PaymenrServiceImpl implements PaymentService {
 		paymentHistoryDTO.setSourceAccountId(paymentRequest.getSourceAccountId());
 		paymentHistoryDTO.setSourceAmount(paymentRequest.getSourceAmount());
 		paymentHistoryDTO.setSourceCurrency(paymentRequest.getSourceCurrency());
-		
+
 		paymentHistory.save(paymentHistoryDTO);
-		
+
 	}
 
 	private BigDecimal calculateRateOfExchange(BigDecimal sourceCurrency, BigDecimal currencyValue) {
