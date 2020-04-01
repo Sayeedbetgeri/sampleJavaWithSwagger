@@ -15,12 +15,12 @@ import com.hackaton.cbft.service.PaymentService;
 public class PaymentsController {
 
 	@Autowired
-	PaymentService PaymentService;
+	PaymentService paymentService;
 	
 	@PostMapping(value = "/transfer")
 	public ResponseEntity<PaymentResponse> transferAmount(@RequestBody PaymentRequest paymentRequest)
 	{
-		PaymentResponse paymentResponse=PaymentService.processPayment(paymentRequest);
+		PaymentResponse paymentResponse=paymentService.processPayment(paymentRequest);
 		
 		return new ResponseEntity<>(paymentResponse,HttpStatus.OK);
 	}

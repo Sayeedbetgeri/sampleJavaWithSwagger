@@ -30,11 +30,11 @@ public class PaymenrServiceImpl implements PaymentService {
 	public PaymentResponse processPayment(PaymentRequest paymentRequest) {
 		updateDestinationAccounts();
 		updateRateOfExchange();
-		System.out.println(paymentRequest);
+		
 		PaymentResponse paymentResponse = new PaymentResponse();
 		Long destinationAccountId = (Long) paymentRequest.getDestAccountId();
 		if (!(destinationAccountMap.get("destAccountId").toString().equals(destinationAccountId.toString()))) {
-			System.out.println(destinationAccountMap.get("destAccountId"));
+	
 			throw new DestinationAccountNotFoundException();
 		}
 		if (paymentRequest.getSourceAmount().compareTo(new BigDecimal(Constants.DAILY_LIMIT)) == 1) {

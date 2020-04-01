@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.hackaton.cbft.Controller.PaymentsController;
 import com.hackaton.cbft.Model.PaymentRequest;
@@ -19,7 +19,7 @@ import com.hackaton.cbft.exceptions.DailyLimitException;
 import com.hackaton.cbft.exceptions.DestinationAccountNotFoundException;
 import com.hackaton.cbft.service.PaymentService;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@RunWith(SpringRunner.class)
 public class TestController {
 
 	@Mock
