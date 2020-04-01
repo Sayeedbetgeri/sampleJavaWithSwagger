@@ -6,17 +6,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hackaton.cbft.Constants.Constants;
+import com.hackaton.cbft.Model.PaymentHistoryDTO;
 import com.hackaton.cbft.Model.PaymentRequest;
 import com.hackaton.cbft.Model.PaymentResponse;
 import com.hackaton.cbft.exceptions.DailyLimitException;
 import com.hackaton.cbft.exceptions.DestinationAccountNotFoundException;
+import com.hackaton.cbft.repository.PaymentHistory;
 
 @Service
 public class PaymenrServiceImpl implements PaymentService {
 
+	@Autowired
+	PaymentHistory paymentHistory;
+	
 	Map<String, String> destinationAccountMap = new HashMap<>();
 	Map<String, BigDecimal> roiMap = new HashMap<>();
 
@@ -44,8 +50,23 @@ public class PaymenrServiceImpl implements PaymentService {
 		paymentResponse.setSourceAmount(paymentRequest.getSourceAmount());
 		paymentResponse.setSourceCurrency(paymentRequest.getSourceCurrency());
 		paymentResponse.setExchangeRate(roiMap.get(destCurrency));
-
+		saveTransactionHistory(paymentRequest,paymentResponse);
 		return paymentResponse;
+	}
+
+	private void saveTransactionHistory(PaymentRequest paymentRequest, PaymentResponse paymentResponse) {
+		PaymentHistoryDTO paymentHistoryDTO = new PaymentHistoryDTO();
+		paymentHistoryDTO.setDestAccountId(paymentRequest.getDestAccountId());
+		paymentHistoryDTO.setExchangeRate(paymentResponse.getExchangeRate());
+		paymentHistoryDTO.setFinalAmount(paymentResponse.getFinalAmount());
+		paymentHistoryDTO.setProceesingFee(paymentResponse.getProceesingFee());
+		paymentHistoryDTO.setRequestId(paymentRequest.getRequestId());
+		paymentHistoryDTO.setSourceAccountId(paymentRequest.getSourceAccountId());
+		paymentHistoryDTO.setSourceAmount(paymentRequest.getSourceAmount());
+		paymentHistoryDTO.setSourceCurrency(paymentRequest.getSourceCurrency());
+		
+		paymentHistory.save(paymentHistoryDTO);
+		
 	}
 
 	private BigDecimal calculateRateOfExchange(BigDecimal sourceCurrency, BigDecimal currencyValue) {
