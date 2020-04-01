@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.hackaton.cbft.Constants.Constants;
 import com.hackaton.cbft.Model.PaymentRequest;
 import com.hackaton.cbft.Model.PaymentResponse;
+import com.hackaton.cbft.exceptions.DailyLimitException;
 import com.hackaton.cbft.exceptions.DestinationAccountNotFoundException;
 
 public class PaymenrServiceImpl  implements PaymentService{
@@ -19,20 +21,66 @@ public class PaymenrServiceImpl  implements PaymentService{
 	@Override
 	public PaymentResponse processPayment(PaymentRequest paymentRequest) {
 		updateDestinationAccounts();
+		PaymentResponse paymentResponse = new PaymentResponse();
 		Long destinationAccountId = (Long)paymentRequest.getDestAccountId();
 		if(!(destinationAccountMap.containsKey(destinationAccountId)))
 		{
 			throw new DestinationAccountNotFoundException();
 		}
-		
+		if(paymentRequest.getSourceAmount().compareTo(new BigDecimal(Constants.DAILY_LIMIT))==1)
+		{
+			throw new DailyLimitException();
+		}
 		String destCurrency = destinationAccountMap.get("currency");
-		//calculateRateOfExchange(paymentRequest.getSourceCurrency(),destCurrency);
+		BigDecimal convertedAmount = calculateRateOfExchange(paymentRequest.getSourceAmount(),roiMap.get("currency"));
+		BigDecimal processingFee = calculateProcessingFee(convertedAmount);
+		BigDecimal finalAmount = convertedAmount.subtract(processingFee);
+		paymentResponse.setFinalAmount(finalAmount);
+		paymentResponse.setProceesingFee(processingFee);
+		paymentResponse.setSourceAmount(paymentRequest.getSourceAmount());
+		paymentResponse.setSourceCurrency(paymentRequest.getSourceCurrency());
+		paymentResponse.setExchangeRate(roiMap.get(destCurrency));
+			
 		
-		return null;
+		
+		return paymentResponse;
 	}
 
 
 	
+
+
+	private BigDecimal calculateRateOfExchange(BigDecimal sourceCurrency, BigDecimal currencyValue) {
+		 return  sourceCurrency.multiply(currencyValue);
+	}
+
+
+
+
+
+	private BigDecimal calculateProcessingFee(BigDecimal actualAmount) {
+		if(actualAmount.intValue() >=1 || actualAmount.intValue() <=1000)
+				{
+					return new BigDecimal(actualAmount.doubleValue()*Constants.zeroPFourPercent);
+				}
+		else if(actualAmount.intValue() >=1001 || actualAmount.intValue() <=2500 )
+		{
+			return new BigDecimal(actualAmount.doubleValue()*Constants.zeroPThreePercent);
+		}
+		else if(actualAmount.intValue() >=2500 || actualAmount.intValue() <=5000 )
+		{
+			return new BigDecimal(actualAmount.doubleValue()*Constants.zeroPTwoPercent);
+			
+		}
+		else if(actualAmount.intValue() >=5001 )
+		{
+			return new BigDecimal(actualAmount.doubleValue()*Constants.zeroPOnePercent);
+		}
+		return null;
+	}
+
+
+
 
 
 	private void updateDestinationAccounts() {
