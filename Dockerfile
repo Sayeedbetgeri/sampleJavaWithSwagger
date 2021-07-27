@@ -1,5 +1,3 @@
-
-Docker file:
 FROM openjdk:8-jdk-alpine
 WORKDIR /app
 COPY .gradle/ .gradle
