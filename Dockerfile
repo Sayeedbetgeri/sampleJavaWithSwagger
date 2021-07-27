@@ -1,6 +1,6 @@
 FROM openjdk:8-jdk-alpine
 WORKDIR /app
-COPY .gradle/ .gradle
+#COPY ./gradle/ ./gradle
 
 RUN ./gradlew build
 COPY src ./src
