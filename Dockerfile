@@ -2,7 +2,7 @@ FROM openjdk:8-jdk-alpine
 WORKDIR /app
 #COPY ./gradle/ ./gradle
 
-RUN ./gradlew build
+RUN ./gradle/gradlew build
 COPY src ./src
 CMD ["./gradlew", "spring-boot:run"]
 #VOLUME /tmp
